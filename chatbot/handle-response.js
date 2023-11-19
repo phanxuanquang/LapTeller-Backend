@@ -1,6 +1,8 @@
-const dialogflow = require("@google-cloud/dialogflow");
+const dialogflow = require('@google-cloud/dialogflow').v2beta1;
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
+
 
 const fs = require("fs");
 const CREDENTIALS = JSON.parse(fs.readFileSync("chatbot/service-account.json"));
@@ -12,7 +14,7 @@ const CONFIGURATION = {
     private_key: CREDENTIALS["private_key"],
     client_email: CREDENTIALS["client_email"],
   },
-};
+}; 
 
 const sessionClient = new dialogflow.SessionsClient(CONFIGURATION);
 
@@ -30,16 +32,15 @@ const detectIntent = async (languageCode, queryText, sessionId) => {
   };
 
   const responses = await sessionClient.detectIntent(request);
-  console.log(responses);
   const result = responses[0].queryResult;
   console.log(result);
-
   return {
     response: result.fulfillmentText.trim(), // change the response here
   };
 };
 
 const webApp = express();
+webApp.use(cors());
 
 webApp.use(
   express.urlencoded({
