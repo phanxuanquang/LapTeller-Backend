@@ -33,34 +33,32 @@ const detectIntent = async (languageCode, queryText, sessionId) => {
 
   const responses = await sessionClient.detectIntent(request);
   const result = responses[0].queryResult;
-  console.log(result);
   return {
     response: result.fulfillmentText.trim(), // change the response here
   };
 };
 
-const webApp = express();
-webApp.use(cors());
+const chatbot = express();
+chatbot.use(cors());
 
-webApp.use(
+chatbot.use(
   express.urlencoded({
     extended: true,
   })
 );
-webApp.use(express.json());
+chatbot.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-webApp.listen(PORT, () => {
+chatbot.listen(PORT, () => {
   console.log(`Server is up and running at ${PORT}`);
 });
 
-webApp.get("/", (req, res) => {
+chatbot.get("/", (req, res) => {
   res.send(`Hello, this is LapTeller!`);
 });
 
-// Dialogflow route
-webApp.post("/dialogflow", async (req, res) => {
+chatbot.post("/dialogflow", async (req, res) => {
   let languageCode = req.body.languageCode || "en";
   let queryText = req.body.queryText;
   let sessionId = req.body.sessionId || "lapteller-project";
