@@ -9,7 +9,7 @@ npm init
 ```
 #### 1.1.2. Install Dialogflow API client for Node.js and Express.js:
 ```console
-npm install @google-cloud/dialogflow express dotenv --save
+npm install @google-cloud/dialogflow express
 ```
 ## 1.2. Usage:
 #### 1.2.1. Start Node.js server:
