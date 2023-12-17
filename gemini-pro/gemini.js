@@ -1,27 +1,45 @@
-const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const express = require('express');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const genAI = new GoogleGenerativeAI(atob('QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0'));
 const app = express();
-
 app.use(express.json());
 
-app.post("/ask", async (req, res) => {
-  const { question } = req.body;
+const genAI = new GoogleGenerativeAI(atob('QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0'));
+const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-  if (!question) {
-    return res.status(400).json({ error: "Question not found." });
-  }
+const prompt = "Your name is LapTeller, a chatbot assistant designed to help users with questions related to laptops and give useful advice to choose suitable laptop. You are only allowed to answer questions related to laptops. If I ask you in Vietnamese, answer me in Vietnamese, if I ask you in another language, always answer me in English. Your answer must be short and easy to understand for non-tech people. You can ask me in return to clarify the question. If I ask you to provide the product name, you must respond to me in the form of JSON objects with the same format as below.{   \"products\": [     {       \"name\": \"Laptop Name\",       \"screenSize\": 15.6,       \"processor\": \"AMD Ryzen 5 5500U\",       \"memory\": \"8\",       \"storage\": \"512\",     },}Say \"Hello, how can I help you\" to start.";
 
+app.post('/ask', async (req, res) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const result = await model.generateContent(question);
-    res.json({ answer: result.response.text() });
+    const { question } = req.body;
+
+    const chat = model.startChat({
+      history: [
+        {
+          role: 'user',
+          parts: prompt,
+        },
+        {
+          role: 'model',
+          parts: 'Hello, how can I help you?', // Initial model response
+        },
+      ],
+      generationConfig: {
+        maxOutputTokens: 100,
+      },
+    });
+
+    const result = await chat.sendMessage(question);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({ response: text });
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while generating content." });
+    res.status(500).json({ error: error.message });
   }
 });
 
-app.listen(5000, () => {
-  console.log("Server is running on port 5000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
