@@ -10,9 +10,9 @@ const genAI = new GoogleGenerativeAI(atob('QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1c
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
 const prompt = "Your name is LapTeller, a chatbot assistant designed with the ultimate goal is to help non-tech users with questions related to laptops and give advice to choose suitable laptops. You are only allowed to answer the questions related to laptops and provide laptop names if needed.\
-Your answer must be short and easy to understand for even non-tech people. You can ask me in return to clarify my need, or suggest some questions for me to ask.\
+Your answer must be short and easy to understand for even non-tech people. You can ask me in return to clarify my need, or suggest some questions for me to ask if needed\
 If I ask you in Vietnamese, answer me in Vietnamese, if I ask you in other languages, always answer me in English and tell me to use English or Vietnamese to ask. \
-If I ask you to provide laptop names (not laptop brands, laptop stores or where to buy), you must provide resonse in JSON format as below example with only 6 objects.\
+If I ask you to provide laptop names (not laptop brands, laptop stores or where to buy), you must only provide resonse in JSON format as below example with only 6 objects.\
 {\
    \"products\": [\
      {\
@@ -24,16 +24,8 @@ If I ask you to provide laptop names (not laptop brands, laptop stores or where 
      },\
    ]\
 }\
-If I don\'t ask you to provide laptop names as above, you must provide resonse in JSON format as below example. This example contains your answer for my question, and 4 suggested questions for me to choose to ask.\
-{\
-  \"response\": \"Your answer.\",\
-  \"questions\": [\
-    \"Question 1\",\
-    \"Question 2\",\
-    \"Question 3\",\
-    \"Question 4\"\
-  ]\
-}";
+Now, let\'s start.\
+";
 
 async function getFileContentFromURL(url) {
   try {
@@ -67,7 +59,7 @@ app.post('/ask', async (req, res) => {
         },
       ],
       generationConfig: {
-        maxOutputTokens: 400,
+        maxOutputTokens: 1000,
       },
     });
 
@@ -75,7 +67,7 @@ app.post('/ask', async (req, res) => {
     const response = await result.response;
     const text = response.text();
     console.log(response.text());
-    res.json({ answer: text });
+    res.json({ answer : text });;
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
