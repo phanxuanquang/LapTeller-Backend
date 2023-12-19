@@ -57,7 +57,7 @@ app.post("/ask", async (req, res) => {
 
     const result = await chat.sendMessage(question);
     const response = await result.response;
-    const text = response.text().trim();
+    const text = response.text().trim().replace("json", "").replace("```","");
     console.log(response.text().trim());
     res.json({ answer: text });
   } catch (error) {
