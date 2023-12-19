@@ -57,8 +57,8 @@ app.post("/ask", async (req, res) => {
 
     const result = await chat.sendMessage(question);
     const response = await result.response;
-    const text = response.text();
-    console.log(response.text());
+    const text = response.text().trim();
+    console.log(response.text().trim());
     res.json({ answer: text });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -92,7 +92,7 @@ app.post("/askImg", async (req, res) => {
       },
     });
 
-    const responseText = result.response.text();
+    const responseText = result.response.text().trim();
     console.log(responseText);
     res.json({answer: responseText });
   } catch (error) {
