@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
+const axios = require("axios");
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -17,22 +18,23 @@ const genAI = new GoogleGenerativeAI(
   atob("QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0")
 );
 
-var prompt = "Your name is LapTeller, a chatbot assistant designed with the ultimate goal is to help non-tech users with questions related to laptops and give advice to choose suitable laptops. You are only allowed to answer the questions related to laptops and provide laptop names if needed.\
+var prompt =
+  'Your name is LapTeller, a chatbot assistant designed with the ultimate goal is to help non-tech users with questions related to laptops and give advice to choose suitable laptops. You are only allowed to answer the questions related to laptops and provide laptop names if needed.\
 Your answer must be short and easy to understand for even non-tech people. You can ask me in return to clarify my need, or suggest some questions for me to ask. Your resonse must contain your answer for my question, and up to 4 suggested questions for me to consider.\
 If I ask you in Vietnamese, answer me in Vietnamese, if I ask you in other languages, always answer me in English and tell me to use English or Vietnamese to ask. \
 If I ask you to provide laptop names (not laptop brands, laptop stores or where to buy), you must provide resonse in JSON format as below example with only 6 objects.\
 {\
-   \"products\": [\
+   "products": [\
      {\
-       \"name\": \"Laptop Name\",\
-       \"screenSize\": 15.6,\
-       \"processor\": \"AMD Ryzen 5 5500U\",\
-       \"memory\": \"8\",\
-       \"storage\": \"512\",\
+       "name": "Laptop Name",\
+       "screenSize": 15.6,\
+       "processor": "AMD Ryzen 5 5500U",\
+       "memory": "8",\
+       "storage": "512",\
      },\
    ]\
 }\
-Now, let\'s start.";
+Now, let\'s start.';
 
 app.post("/ask", async (req, res) => {
   try {
@@ -81,7 +83,9 @@ app.post("/askImg", async (req, res) => {
         },
       },
       {
-        text: "I want to buy laptop, so you are only allowed to anwer questions related to laptop or laptop buying to help me. Your answer must be short, very easy for non-tech people to understand. My question is: " + question,
+        text:
+          "I want to buy laptop, so you are only allowed to anwer questions related to laptop or laptop buying to help me. Your answer must be short, very easy for non-tech people to understand. My question is: " +
+          question,
       },
     ];
 
@@ -94,10 +98,31 @@ app.post("/askImg", async (req, res) => {
 
     const responseText = result.response.text().trim();
     console.log(responseText);
-    res.json({answer: responseText });
+    res.json({ answer: responseText });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "An error occurred" });
+  }
+});
+
+app.get("/getSerpApiData", async (req, res) => {
+  try {
+    const response = await axios.get("https://serpapi.com/search.json", {
+      params: {
+        engine: "google_shopping",
+        q: req.query.q,
+        hl: "en",
+        gl: "vn",
+        api_key: atob(
+          "MDQzYmUzNDA2YjJjZWI2NmE3MTQ3OTQ2NWU0MzY1ZTY0OWE2YjM2OTkyOTE5MzJiMWQ0OTE5OWEwNDY0MGJkZg=="
+        ),
+      },
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
