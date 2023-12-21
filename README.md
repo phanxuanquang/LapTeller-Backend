@@ -1,4 +1,4 @@
-# 1. LapTeller Backend Intergration Guidance
+# LapTeller Backend Intergration Guidance
 
 A brief of step-by-step command lines to setup DialogFlow API using Node.js and Express.js
 ## 1.1. Set up project:
