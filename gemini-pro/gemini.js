@@ -2,11 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const axios = require('axios');
-
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
+const { getJson } = require('serpapi');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 
@@ -127,6 +126,28 @@ app.post("/getProductList", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post('/getProductDetail', async (req, res) => {
+  try {
+    const { product_id } = req.body;
+
+    getJson(
+      {
+        engine: "google_product",
+        product_id,
+        hl: "vi",
+        gl: "vn",
+        api_key: apiKey,
+      },
+      (json) => {
+        res.json(json['product_results']);
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
