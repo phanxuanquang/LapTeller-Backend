@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const axios = require("axios");
+const axios = require('axios');
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -17,12 +17,15 @@ app.use(bodyParser.json());
 const genAI = new GoogleGenerativeAI(
   atob("QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0")
 );
+const apiKey = atob(
+  "MDQzYmUzNDA2YjJjZWI2NmE3MTQ3OTQ2NWU0MzY1ZTY0OWE2YjM2OTkyOTE5MzJiMWQ0OTE5OWEwNDY0MGJkZg=="
+);
 
 var prompt =
   'Your name is LapTeller, a chatbot assistant designed with the ultimate goal is to help non-tech users with questions related to laptops and give advice to choose suitable laptops. You are only allowed to answer the questions related to laptops and provide laptop names if needed.\
-Your answer must be short and easy to understand for even non-tech people. You can ask me in return to clarify my need, or suggest some questions for me to ask. Your resonse must contain your answer for my question, and up to 4 suggested questions for me to consider.\
+Your answer must be short and easy to understand for even non-tech people. You can ask me in return to clarify my need, or suggest some questions for me to ask.\
 If I ask you in Vietnamese, answer me in Vietnamese, if I ask you in other languages, always answer me in English and tell me to use English or Vietnamese to ask. \
-If I ask you to provide laptop names (not laptop brands, laptop stores or where to buy), you must provide resonse in JSON format as below example with only 6 objects.\
+If I ask you to provide laptop names (not laptop brands, laptop stores or where to buy), you must provide resonse in JSON format as below example with exactly 6 objects.\
 {\
    "products": [\
      {\
@@ -105,26 +108,28 @@ app.post("/askImg", async (req, res) => {
   }
 });
 
-app.get("/getSerpApiData", async (req, res) => {
+
+
+app.post("/getProductList", async (req, res) => {
   try {
+    const { q } = req.body; 
     const response = await axios.get("https://serpapi.com/search.json", {
       params: {
         engine: "google_shopping",
-        q: req.query.q,
-        hl: "en",
+        q,
+        hl: "vi",
         gl: "vn",
-        api_key: atob(
-          "MDQzYmUzNDA2YjJjZWI2NmE3MTQ3OTQ2NWU0MzY1ZTY0OWE2YjM2OTkyOTE5MzJiMWQ0OTE5OWEwNDY0MGJkZg=="
-        ),
+        api_key: apiKey,
       },
     });
 
-    res.json(response.data);
+    res.json(response.data.shopping_results);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
