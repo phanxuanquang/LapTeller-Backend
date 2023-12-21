@@ -2,6 +2,7 @@
 
 A brief of step-by-step command lines to setup DialogFlow API using Node.js and Express.js
 ## 1.1. Set up project:
+Download and install Node.js modules.
 ```console
 npm i
 ```
@@ -18,6 +19,6 @@ POST http://localhost:5000/ask
 Request body:
 ```json
 {
-    "queryText":"Hello!"
+    "question" : "Hello!"
 }
 ```
