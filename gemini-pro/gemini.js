@@ -59,7 +59,7 @@ app.post("/ask", async (req, res) => {
       },
     });
 
-    const result = await chat.sendMessage(question);
+    const result = await chat.sendMessage("Remember that your response mustn't contain JSON objects and plain text at the same time. My question: "+ question);
     const response = await result.response;
     const text = response.text().trim().replace("json", "").replace("```","");
     console.log(response.text().trim());
