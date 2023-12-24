@@ -1,10 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const axios = require('axios');
+const axios = require("axios");
 const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
-const { getJson } = require('serpapi');
+const { getJson } = require("serpapi");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
@@ -59,9 +59,13 @@ app.post("/ask", async (req, res) => {
       },
     });
 
-    const result = await chat.sendMessage("Remember that your response mustn't contain JSON objects and plain text at the same time. My question: "+ question);
+    const result = await chat.sendMessage(question);
     const response = await result.response;
-    const text = response.text().trim().replace("json", "").replace("```","");
+    const text = response
+      .text()
+      .trim()
+      .replace("json", "")
+      .replaceAll("```", "");
     console.log(response.text().trim());
     res.json({ answer: text });
   } catch (error) {
@@ -107,15 +111,13 @@ app.post("/askImg", async (req, res) => {
   }
 });
 
-
-
 app.post("/getProductList", async (req, res) => {
   try {
-    const { q } = req.body; 
+    const { productName } = req.body;
     const response = await axios.get("https://serpapi.com/search.json", {
       params: {
         engine: "google_shopping",
-        q,
+        q: productName,
         hl: "vi",
         gl: "vn",
         api_key: apiKey,
@@ -129,7 +131,7 @@ app.post("/getProductList", async (req, res) => {
   }
 });
 
-app.post('/getProductDetail', async (req, res) => {
+app.post("/getProductDetail", async (req, res) => {
   try {
     const { product_id } = req.body;
 
@@ -142,15 +144,14 @@ app.post('/getProductDetail', async (req, res) => {
         api_key: apiKey,
       },
       (json) => {
-        res.json(json['product_results']);
+        res.json(json["product_results"]);
       }
     );
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send("Internal Server Error");
   }
 });
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
