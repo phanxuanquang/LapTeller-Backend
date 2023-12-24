@@ -59,7 +59,7 @@ app.post("/ask", async (req, res) => {
       },
     });
 
-    const result = await chat.sendMessage("Remember that your response mustn't contain JSON objects and plain text at the same time. My question: "+ question);
+    const result = await chat.sendMessage("Remember that your response mustn't contain JSON and plain text at the same time. My question: "+ question);
     const response = await result.response;
     const text = response.text().trim().replace("json", "").replace("```","");
     console.log(response.text().trim());
@@ -116,6 +116,7 @@ app.post("/getProductList", async (req, res) => {
       params: {
         engine: "google_shopping",
         q,
+        tbs: "mr:1,avg_rating:300",
         hl: "vi",
         gl: "vn",
         api_key: apiKey,
