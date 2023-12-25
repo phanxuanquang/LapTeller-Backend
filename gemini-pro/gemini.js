@@ -117,7 +117,7 @@ app.post("/getProductList", async (req, res) => {
     const response = await axios.get("https://serpapi.com/search.json", {
       params: {
         engine: "google_shopping",
-        q,
+        q: productName,
         hl: "vi",
         gl: "vn",
         api_key: apiKey,
@@ -151,6 +151,30 @@ app.post("/getProductDetail", async (req, res) => {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
+});
+
+app.post("/getStoreLocations", (req, res) => {
+  const { storeName, lat, long } = req.body;
+
+  if (!storeName || !lat || !long) {
+    return res
+      .status(400)
+      .json({
+        error: "Please provide store name, latitude, and longitude parameters.",
+      });
+  }
+  const ll = `@${lat},${long}`;
+  const queryParams = {
+    engine: "google_maps",
+    q: storeName,
+    ll,
+    type: "search",
+    api_key: apiKey,
+  };
+
+  getJson(queryParams, (json) => {
+    res.json(json["local_results"]);
+  });
 });
 
 const PORT = process.env.PORT || 5000;
