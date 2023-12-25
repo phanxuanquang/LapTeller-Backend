@@ -118,7 +118,7 @@ app.post("/getProductList", async (req, res) => {
       params: {
         engine: "google_shopping",
         q: productName,
-        hl: "vi",
+        hl: "en",
         gl: "vn",
         api_key: apiKey,
       },
@@ -139,7 +139,7 @@ app.post("/getProductDetail", async (req, res) => {
       {
         engine: "google_product",
         product_id,
-        hl: "vi",
+        hl: "en",
         gl: "vn",
         api_key: apiKey,
       },
@@ -173,7 +173,7 @@ app.post("/getStoreLocations", (req, res) => {
   };
 
   getJson(queryParams, (json) => {
-    res.json(json["local_results"]);
+    res.json(json);
   });
 });
 
