@@ -177,6 +177,23 @@ app.post("/getStoreLocations", (req, res) => {
   });
 });
 
+app.post("/getLocalStoreLocations", (req, res) => {
+  const { storeName } = req.body;
+  const queryParams = {
+    engine: "google_local",
+    q: storeName,
+    google_domain: "google.com.vn",
+    location: "Ho Chi Minh City, Ho Chi Minh City, Vietnam",
+    hl: "en",
+    gl: "vn",
+    api_key: apiKey,
+  };
+
+  getJson(queryParams, (json) => {
+    res.json(json["local_results"]);
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
