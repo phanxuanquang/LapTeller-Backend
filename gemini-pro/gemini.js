@@ -120,6 +120,7 @@ app.post("/getProductList", async (req, res) => {
         q: productName,
         hl: "en",
         gl: "vn",
+        tbs: "mr:1,avg_rating:300,new:1,new:3",
         api_key: apiKey,
       },
     });
