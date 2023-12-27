@@ -20,23 +20,15 @@ const apiKey = atob(
   "MDQzYmUzNDA2YjJjZWI2NmE3MTQ3OTQ2NWU0MzY1ZTY0OWE2YjM2OTkyOTE5MzJiMWQ0OTE5OWEwNDY0MGJkZg=="
 );
 
-var prompt =
-  'Your name is LapTeller, a chatbot designed with the goal is to help non-tech users with questions related to laptops and give advice to choose suitable laptops. You are only allowed to answer the questions related to laptops and provide laptop names if needed.\
-Your answer must be short and easy to understand for even non-tech people. You can ask me in return to clarify my need. The currency used for product pricing must be VND or USD (1 USD = 24500 VND). \
-If I ask you in Vietnamese, answer me in Vietnamese, if I ask you in other languages, always answer me in English and tell me to use English or Vietnamese to ask. \
-In case I tell you to provide laptop name list (not laptop brands, laptop store names, or where to buy), you must always provide resonse in JSON format as below example with exactly 6 objects without any plain text else or explanation else or introduction else, because I only want JSON objects in that case, and products must be released in 2022 or 2023.\
-{\
-   "products": [\
-     {\
-       "name": "Laptop Name",\
-       "screenSize": 15.6,\
-       "processor": "AMD Ryzen 5 5500U",\
-       "memory": "8",\
-       "storage": "512",\
-     },\
-   ]\
-}\
-Now, let\'s start.';
+function GetStringFrom(inputPath) {
+  try {
+    const content = fs.readFileSync(inputPath, "utf8");
+    return content;
+  } catch (error) {
+    console.error("Error reading file:", error);
+    return null;
+  }
+}
 
 app.post("/ask", async (req, res) => {
   try {
@@ -47,11 +39,11 @@ app.post("/ask", async (req, res) => {
       history: [
         {
           role: "user",
-          parts: prompt,
+          parts: GetStringFrom("gemini-pro/promt.txt"),
         },
         {
           role: "model",
-          parts: "Hello, how can I help you?", // Initial model response
+          parts: "Hello, how can I help you?",
         },
       ],
       generationConfig: {
@@ -66,8 +58,9 @@ app.post("/ask", async (req, res) => {
       .trim()
       .replace("json", "")
       .replaceAll("```", "");
+    const jsonData = JSON.parse(text);
     console.log(response.text().trim());
-    res.json({ answer: text });
+    res = jsonData;
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -158,11 +151,9 @@ app.post("/getStoreLocations", (req, res) => {
   const { storeName, lat, long } = req.body;
 
   if (!storeName || !lat || !long) {
-    return res
-      .status(400)
-      .json({
-        error: "Please provide store name, latitude, and longitude parameters.",
-      });
+    return res.status(400).json({
+      error: "Please provide store name, latitude, and longitude parameters.",
+    });
   }
   const ll = `@${lat},${long}`;
   const queryParams = {
