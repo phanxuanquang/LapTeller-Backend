@@ -61,8 +61,6 @@ const askGemini = async (question, res) => {
     
       try{
         const jsonData = JSON.parse(text);
-        console.log(response.text().trim());
-        res.json(jsonData); 
       }
       catch (error) {
         tryCount++;
@@ -74,7 +72,9 @@ const askGemini = async (question, res) => {
           await askGemini(question, res);
         }
       }
-
+      console.log(response.text().trim());
+      tryCount = 0;
+      res.json(jsonData); 
   } catch (error) {
     console.error("Error:", error.message);
   }
