@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
 const { getJson } = require("serpapi");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { count } = require("console");
 
 const app = express();
 
@@ -30,11 +31,10 @@ function GetStringFrom(inputPath) {
   }
 }
 
-app.post("/ask", async (req, res) => {
+var tryCount = 0;
+const askGemini = async (question, res) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const { question } = req.body;
-
     const chat = model.startChat({
       history: [
         {
@@ -58,12 +58,31 @@ app.post("/ask", async (req, res) => {
       .trim()
       .replace("json", "")
       .replaceAll("```", "");
-    const jsonData = JSON.parse(text);
-    console.log(response.text().trim());
-    res = jsonData;
+    
+      try{
+        const jsonData = JSON.parse(text);
+        console.log(response.text().trim());
+        res.json(jsonData); 
+      }
+      catch (error) {
+        tryCount++;
+        if(tryCount > 3){
+          console.error("Error:", error.message);
+          res.status(500).json({ error: "An error occurred" });
+        }
+        else {
+          await askGemini(question, res);
+        }
+      }
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error:", error.message);
   }
+};
+
+app.post("/ask", async (req, res) => {
+  const { question } = req.body;
+  await askGemini(question, res);
 });
 
 app.post("/askImg", async (req, res) => {
