@@ -111,7 +111,7 @@ app.post("/getProductList", async (req, res) => {
       params: {
         engine: "google_shopping",
         q: productName,
-        hl: "en",
+        hl: "vi",
         gl: "vn",
         tbs: "mr:1,avg_rating:300,new:1,new:3",
         api_key: apiKey,
@@ -133,7 +133,7 @@ app.post("/getProductDetail", async (req, res) => {
       {
         engine: "google_product",
         product_id,
-        hl: "en",
+        hl: "vi",
         gl: "vn",
         api_key: apiKey,
       },
@@ -176,7 +176,7 @@ app.post("/getLocalStoreLocations", (req, res) => {
     q: storeName,
     google_domain: "google.com.vn",
     location: "Ho Chi Minh City, Ho Chi Minh City, Vietnam",
-    hl: "en",
+    hl: "vi",
     gl: "vn",
     api_key: apiKey,
   };
