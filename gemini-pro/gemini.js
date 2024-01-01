@@ -43,7 +43,7 @@ const askGemini = async (question, res) => {
         },
         {
           role: "model",
-          parts: "Hello, how can I help you?",
+          parts: "I got it. I will always use English for my answers, and provide response with your JSON format exactly. My mission is to help users to choose suitable laptops and give them useful advice about buying laptop. Let's start.",
         },
       ],
       generationConfig: {
@@ -61,22 +61,26 @@ const askGemini = async (question, res) => {
     
       try{
         const jsonData = JSON.parse(text);
+        res.json(jsonData);
+        console.log(response.text().trim()); 
       }
       catch (error) {
         tryCount++;
-        if(tryCount > 3){
+        console.log("Trying times: ", tryCount);
+        console.log(text);
+
+        if(tryCount > 5){
           console.error("Error:", error.message);
-          res.status(500).json({ error: "An error occurred" });
+          res.status(500).json({ error: "Please ask me another question." });
         }
         else {
-          await askGemini(question, res);
+          await askGemini("Remember to provide in JSON format as my example. My question: " + question, res);
         }
       }
-      console.log(response.text().trim());
       tryCount = 0;
-      res.json(jsonData); 
   } catch (error) {
     console.error("Error:", error.message);
+    res.status(500).json({ error: "Sorry, I cannot answer this question. Please ask me another question." });
   }
 };
 
@@ -147,7 +151,6 @@ app.post("/getProductList", async (req, res) => {
 app.post("/getProductDetail", async (req, res) => {
   try {
     const { product_id } = req.body;
-
     getJson(
       {
         engine: "google_product",
@@ -204,6 +207,28 @@ app.post("/getLocalStoreLocations", (req, res) => {
     res.json(json["local_results"]);
   });
 });
+
+app.get('/translate', async (req, res) => {
+  const inputText = req.query.text; 
+
+  try {
+    const response = await axios.get('https://translate.googleapis.com/translate_a/single', {
+      params: {
+        client: 'gtx',
+        sl: 'auto', // input language
+        tl: 'vi', // output language
+        dt: 't',
+        q: inputText,
+      },
+    });
+
+    res.json({ translation : response.data[0][0][0] });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Translating in to Vietnamese failed.' });
+  }
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
