@@ -71,7 +71,7 @@ const askGemini = async (question, res) => {
 
         if(tryCount > 5){
           console.error("Error:", error.message);
-          res.status(500).json({ error: "Please ask me another question." });
+          res.status(500).json({ error: error.message });
         }
         else {
           await askGemini("Remember to provide in JSON format as my example. My question: " + question, res);
@@ -80,7 +80,7 @@ const askGemini = async (question, res) => {
       tryCount = 0;
   } catch (error) {
     console.error("Error:", error.message);
-    res.status(500).json({ error: "Sorry, I cannot answer this question. Please ask me another question." });
+    res.status(500).json({ error: error.message.replace('[GoogleGenerativeAI Error]: Text not available. ', '') });
   }
 };
 
@@ -106,7 +106,7 @@ app.post("/askImg", async (req, res) => {
       },
       {
         text:
-          "I want to buy laptop, so you are only allowed to anwer questions related to laptop. Your answer must be short, very easy for non-tech people to understand. My question is: " +
+          "I want to buy laptop, so you are only allowed to anwer questions related to laptop. Your answer must be short, very easy for non-tech people to understand. My question: " +
           question,
       },
     ];
@@ -123,7 +123,7 @@ app.post("/askImg", async (req, res) => {
     res.json({ answer: responseText });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "An error occurred" });
+    res.status(500).json({ error: error.message });
   }
 });
 
