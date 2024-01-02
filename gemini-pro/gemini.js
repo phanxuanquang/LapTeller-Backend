@@ -17,9 +17,7 @@ app.use(bodyParser.json());
 const genAI = new GoogleGenerativeAI(
   atob("QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0")
 );
-const apiKey = atob(
-  "MDQzYmUzNDA2YjJjZWI2NmE3MTQ3OTQ2NWU0MzY1ZTY0OWE2YjM2OTkyOTE5MzJiMWQ0OTE5OWEwNDY0MGJkZg=="
-);
+const apiKey = '35630fcd089f7700c6240c14fd4d301f20e2bdbcb51e420414ffff1b2c1dc0cf';
 
 function GetStringFrom(inputPath) {
   try {
@@ -55,9 +53,9 @@ const askGemini = async (question, res) => {
     const response = await result.response;
     const text = response
       .text()
-      .trim()
       .replace("json", "")
-      .replaceAll("```", "");
+      .replaceAll("```", "")
+      .trim();
     
       try{
         const jsonData = JSON.parse(text);
