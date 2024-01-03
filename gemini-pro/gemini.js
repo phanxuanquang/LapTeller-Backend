@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 const genAI = new GoogleGenerativeAI(
   atob("QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0")
 );
-const apiKey = '35630fcd089f7700c6240c14fd4d301f20e2bdbcb51e420414ffff1b2c1dc0cf';
+const apiKey = '98af36501d1291c96c00f97896797e371581682c32f121d5240ce75a79723168';
 
 function GetStringFrom(inputPath) {
   try {
