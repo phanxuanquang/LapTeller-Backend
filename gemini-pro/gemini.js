@@ -143,7 +143,7 @@ app.post("/getProductList", async (req, res) => {
       res.json(response.data.shopping_results);
     }
     else{
-      res.json({ error: "Empty product list" }); 
+      res.status(404).send("Invalid Product");
     }
   } catch (error) {
     console.error(error);
