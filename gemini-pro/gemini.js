@@ -17,7 +17,8 @@ app.use(bodyParser.json());
 const genAI = new GoogleGenerativeAI(
   atob("QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0")
 );
-const apiKey = '98af36501d1291c96c00f97896797e371581682c32f121d5240ce75a79723168';
+const apiKey =
+  "98af36501d1291c96c00f97896797e371581682c32f121d5240ce75a79723168";
 
 function GetStringFrom(inputPath) {
   try {
@@ -29,8 +30,32 @@ function GetStringFrom(inputPath) {
   }
 }
 
-var tryCount = 0;
+const MAX_RETRIES = 5;
+
 const askGemini = async (question, res) => {
+  let tryCount = 0;
+
+  const handleError = (error) => {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: error.message });
+  };
+
+  const handleRetry = async (text) => {
+    tryCount++;
+    console.log("Trying times:", tryCount);
+    console.log(text);
+
+    if (tryCount > MAX_RETRIES) {
+      console.error("Exceeded maximum retries.");
+      res.status(500).json({ error: "Exceeded maximum retries." });
+    } else {
+      await askGemini(
+        `I want a better answer, and remember to provide response in JSON format as my example. My question: ${question}`,
+        res
+      );
+    }
+  };
+
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const chat = model.startChat({
@@ -41,11 +66,12 @@ const askGemini = async (question, res) => {
         },
         {
           role: "model",
-          parts: "I got it. I will always use English for my answers, and provide response with your JSON format exactly. My mission is to help users to choose suitable laptops and give them useful advice about buying laptop. Let's start.",
+          parts:
+            "I got it. I will always use English for my answers, and provide response with your JSON format exactly. My mission is to help users to choose suitable laptops and give them useful advice about buying laptop. Let's start.",
         },
       ],
       generationConfig: {
-        maxOutputTokens: 2048,
+        maxOutputTokens: 4096,
       },
     });
 
@@ -53,32 +79,19 @@ const askGemini = async (question, res) => {
     const response = await result.response;
     const text = response
       .text()
-      .replace("json", "")
-      .replaceAll("```", "")
+      .replace(/json/g, "")
+      .replace(/```/g, "") 
       .trim();
-    
-      try{
-        const jsonData = JSON.parse(text);
-        res.json(jsonData);
-        console.log(response.text().trim()); 
-      }
-      catch (error) {
-        tryCount++;
-        console.log("Trying times: ", tryCount);
-        console.log(text);
 
-        if(tryCount > 5){
-          console.error("Error:", error.message);
-          res.status(500).json({ error: error.message });
-        }
-        else {
-          await askGemini("Remember to provide in JSON format as my example. My question: " + question, res);
-        }
-      }
-      tryCount = 0;
+    try {
+      const jsonData = JSON.parse(text);
+      res.json(jsonData);
+      console.log(response.text().trim());
+    } catch (error) {
+      await handleRetry(text);
+    }
   } catch (error) {
-    console.error("Error:", error.message);
-    res.status(500).json({ error: error.message.replace('[GoogleGenerativeAI Error]: Text not available. ', '') });
+    handleError(error);
   }
 };
 
@@ -139,8 +152,8 @@ app.post("/getProductList", async (req, res) => {
       },
     });
 
-    if (response.data.shopping_results != null){
-      const item = response.data.shopping_results.map(item => ({
+    if (response.data.shopping_results != null) {
+      const item = response.data.shopping_results.map((item) => ({
         product_id: item.product_id,
         link: item.link,
         source: item.source,
@@ -148,12 +161,11 @@ app.post("/getProductList", async (req, res) => {
         rating: item.rating,
         reviews: item.reviews,
         thumbnail: item.thumbnail,
-        isNew: item.second_hand_condition ? false : true 
-    }));
+        isNew: item.second_hand_condition ? false : true,
+      }));
 
-    res.json(item);
-    }
-    else{
+      res.json(item);
+    } else {
       res.status(404).send("Invalid Product");
     }
   } catch (error) {
@@ -222,27 +234,29 @@ app.post("/getLocalStoreLocations", (req, res) => {
   });
 });
 
-app.get('/translate', async (req, res) => {
-  const inputText = req.query.text; 
+app.get("/translate", async (req, res) => {
+  const inputText = req.query.text;
 
   try {
-    const response = await axios.get('https://translate.googleapis.com/translate_a/single', {
-      params: {
-        client: 'gtx',
-        sl: 'auto', // input language
-        tl: 'vi', // output language
-        dt: 't',
-        q: inputText,
-      },
-    });
+    const response = await axios.get(
+      "https://translate.googleapis.com/translate_a/single",
+      {
+        params: {
+          client: "gtx",
+          sl: "auto", // input language
+          tl: "vi", // output language
+          dt: "t",
+          q: inputText,
+        },
+      }
+    );
 
-    res.json({ translation : response.data[0][0][0] });
+    res.json({ translation: response.data[0][0][0] });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Translating in to Vietnamese failed.' });
+    res.status(500).json({ error: "Translating in to Vietnamese failed." });
   }
 });
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
