@@ -140,7 +140,18 @@ app.post("/getProductList", async (req, res) => {
     });
 
     if (response.data.shopping_results != null){
-      res.json(response.data.shopping_results);
+      const item = response.data.shopping_results.map(item => ({
+        product_id: item.product_id,
+        link: item.link,
+        source: item.source,
+        price: item.extracted_price,
+        rating: item.rating,
+        reviews: item.reviews,
+        thumbnail: item.thumbnail,
+        isNew: item.second_hand_condition ? false : true 
+    }));
+
+    res.json(item);
     }
     else{
       res.status(404).send("Invalid Product");
