@@ -134,12 +134,17 @@ app.post("/getProductList", async (req, res) => {
         q: productName,
         hl: "vi",
         gl: "vn",
-        tbs: "mr:1,avg_rating:300,new:1,new:3",
+        tbs: "mr:1,avg_rating:300",
         api_key: apiKey,
       },
     });
 
-    res.json(response.data.shopping_results);
+    if (response.data.shopping_results != null){
+      res.json(response.data.shopping_results);
+    }
+    else{
+      res.json({ error: "Empty product list" }); 
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
