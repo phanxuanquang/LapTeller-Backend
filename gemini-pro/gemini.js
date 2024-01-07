@@ -30,8 +30,6 @@ function GetStringFrom(inputPath) {
   }
 }
 
-const MAX_RETRIES = 5;
-
 const askGemini = async (question, res) => {
   let tryCount = 0;
 
@@ -45,7 +43,7 @@ const askGemini = async (question, res) => {
     console.log("Trying times:", tryCount);
     console.log(text);
 
-    if (tryCount > MAX_RETRIES) {
+    if (tryCount > 5) {
       console.error("Exceeded maximum retries.");
       res.status(500).json({ error: "Exceeded maximum retries." });
     } else {
@@ -76,11 +74,11 @@ const askGemini = async (question, res) => {
     });
 
     const result = await chat.sendMessage(question);
-    const response = await result.response;
+    const response = result.response;
     const text = response
       .text()
-      .replace(/json/g, "")
-      .replace(/```/g, "") 
+      .replaceAll("json", "")
+      .replaceAll("```", "")
       .trim();
 
     try {
