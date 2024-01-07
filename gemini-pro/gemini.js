@@ -115,7 +115,7 @@ app.post("/askImg", async (req, res) => {
       },
       {
         text:
-          "I want to buy laptop, so you are only allowed to anwer questions related to laptop. Your answer must be short, very easy for non-tech people to understand. My question: " +
+          "You are only allowed to answer questions related to laptop, and use English to answer. Your answer must be clear and very easy for non-tech people to understand. You can give me some useful advice if necessary if needed or provide some information related to the laptop in the image if any. My question: " +
           question,
       },
     ];
