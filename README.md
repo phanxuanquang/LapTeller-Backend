@@ -1,8 +1,27 @@
-# LapTeller Backend Intergration Guidance
+# LapTeller Building Guidance
 
-A brief of step-by-step command lines to setup DialogFlow API using Node.js and Express.js
+A brief of step-by-step command lines to re-build LapTeller project.
 ## 1.1. Set up project:
-Download and install Node.js modules.
+
+Step 1. Install Node.js and npm (skip if you had it already):
+
+- [**Node.js**](https://nodejs.org/en/download/package-manager)
+- [**npm**](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+
+Step 2: Clone sub-module for frontend.
+```console
+git submodule update --init --recursive
+```
+
+Step 3: Install Node.js modules for backend project.
+```console
+npm i
+```
+
+Step 4: Install Node.js modules for frontend project.
+```console
+cd lapteller
+```
 ```console
 npm i
 ```
@@ -11,14 +30,10 @@ npm i
 ```console
 node gemini-pro/gemini.js
 ```
-#### 1.2.2. Usage of the API:
-Endpoint:
-```yaml
-POST http://localhost:5000/ask
+#### 1.2.1. Start React application:
+```console
+cd lapteller
 ```
-Request body:
-```json
-{
-    "question" : "Hello!"
-}
+```console
+npm start
 ```
