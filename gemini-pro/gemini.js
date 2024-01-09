@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0"));
 const apiKey = process.env.SERP_API_KEY;
 const loadHistoryFromFile = (jsonPath) => {
   try {
