@@ -10,6 +10,7 @@ const {
   HarmCategory,
   HarmBlockThreshold,
 } = require("@google/generative-ai");
+require("dotenv").config();
 
 const app = express();
 
@@ -17,12 +18,8 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
-const genAI = new GoogleGenerativeAI(
-  atob("QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0")
-);
-const apiKey =
-  "98af36501d1291c96c00f97896797e371581682c32f121d5240ce75a79723168";
-
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const apiKey = process.env.SERP_API_KEY;
 const loadHistoryFromFile = (jsonPath) => {
   try {
     const historyData = fs.readFileSync(jsonPath, "utf8");
