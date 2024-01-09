@@ -34,7 +34,8 @@ const loadHistoryFromFile = (jsonPath) => {
   }
 };
 
-const chatLog = loadHistoryFromFile("gemini-pro/train-context.json");
+//const chatLog = loadHistoryFromFile("gemini-pro/train-context-laptop.json");
+const chatLog = loadHistoryFromFile("gemini-pro/train-context-smartphone.json");
 
 const askGemini = async (question, res) => {
   let tryCount = 0;
