@@ -18,8 +18,8 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
-const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RFR4dkpFZEhNRzVhOGI5ejhTQ3V1czRqZ25MOTFfeWk0"));
-const apiKey = atob("OThhZjM2NTAxZDEyOTFjOTZjMDBmOTc4OTY3OTdlMzcxNTgxNjgyYzMyZjEyMWQ1MjQwY2U3NWE3OTcyMzE2OA==");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const apiKey = process.env.SERP_API_KEY;
 const loadHistoryFromFile = (jsonPath) => {
   try {
     const historyData = fs.readFileSync(jsonPath, "utf8");
