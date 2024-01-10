@@ -250,27 +250,23 @@ app.post("/getLocalStoreLocations", (req, res) => {
   });
 });
 
-app.get("/translate", async (req, res) => {
-  const inputText = req.query.text;
-
+app.get('/news', async (req, res) => {
   try {
-    const response = await axios.get(
-      "https://translate.googleapis.com/translate_a/single",
-      {
-        params: {
-          client: "gtx",
-          sl: "auto", // input language
-          tl: "vi", // output language
-          dt: "t",
-          q: inputText,
-        },
-      }
-    );
+    const { q } = req.query;
+    
+    const apiUrl = 'https://newsapi.org/v2/everything';
+    const response = await axios.get(apiUrl, {
+      params: {
+        q,
+        sortBy: "popularity",
+        pageSize: 30,
+        apiKey: process.env.NEWS_API_KEY,
+      },
+    });
 
-    res.json({ translation: response.data[0][0][0] });
+    res.json(response.data);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Translating in to Vietnamese failed." });
+    res.status(500).json({ error: error.message });
   }
 });
 
