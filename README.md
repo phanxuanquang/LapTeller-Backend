@@ -1,7 +1,18 @@
-# LapTeller Building Guidance
-
+**© 2023 University of Information Technology / LapTeller Project**
+------------
+![alt text](https://i.imgur.com/pXOoTDe.jpeg)
+## 0. Our team:
+| NO. | NAME | RESPONSIBILITY |
+| --- | --- | --- |
+| 1 | [Phan Xuan Quang](https://github.com/phanxuanquang "Phan Xuân Quang") | Backend Development, AI Model Fine-Tuning, DevOps |
+| 2 | [Bui Minh Tuan](https://github.com/tuan20520342 "Bùi Minh Tuấn") | Web Application Development |
+| 3 | [Din Hien Dung](https://github.com/dung-ovl "Dín Hiền Dũng") | Mobile Application Development |
+## 1. Overview
+### 1.1. The use cases:
+### 1.2. Our solution:
+## 2. Re-building Guidance
 A brief of step-by-step command lines to re-build LapTeller project.
-## 1.1. Set up project:
+### 2.1. Set up project:
 
 Step 1. Install Node.js and npm (skip if you had it already):
 
@@ -25,12 +36,12 @@ cd lapteller
 ```console
 npm i
 ```
-## 1.2. Usage:
-#### 1.2.1. Start Node.js server:
+### 2.2. Usage:
+##### 2.2.1. Start Node.js server:
 ```console
 node gemini-pro/gemini.js
 ```
-#### 1.2.1. Start React application:
+##### 2.2.1. Start React application:
 ```console
 cd lapteller
 ```
