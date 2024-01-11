@@ -190,6 +190,55 @@ app.post("/getProductList", async (req, res) => {
   }
 });
 
+app.post("/getProductListPro", async (req, res) => {
+  try {
+    const { productName } = req.body;
+
+    if (!productName) {
+      return res.status(400).json({ error: 'Missing "q" parameter' });
+    }
+
+    const config = {
+      method: "post",
+      url: "https://google.serper.dev/shopping",
+      headers: {
+        "X-API-KEY": process.env.SERPER_API_KEY,
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({
+        q: productName,
+        gl: "vn",
+      }),
+    };
+    const response = await axios(config);
+
+    if (response.data.shopping && Array.isArray(response.data.shopping)) {
+      const transformProduct = (product) => {
+        const isNew = !product.price.includes("used");
+        const price = product.price.replace(/[₫,used]/g, "").trim();
+
+        const transformedProduct = {
+          product_id: product.id,
+          link: product.link,
+          source: product.source,
+          price: price,
+          thumbnail: product.imageUrl,
+          isNew: isNew,
+        };
+
+        return transformedProduct;
+      };
+      const transformedArray = response.data.shopping.map(transformProduct);
+      res.json(transformedArray);
+    } else {
+      res.json(response.data);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.post("/getProductDetail", async (req, res) => {
   try {
     const { product_id } = req.body;
@@ -250,11 +299,11 @@ app.post("/getLocalStoreLocations", (req, res) => {
   });
 });
 
-app.get('/news', async (req, res) => {
+app.get("/news", async (req, res) => {
   try {
     const { q } = req.query;
-    
-    const apiUrl = 'https://newsapi.org/v2/everything';
+
+    const apiUrl = "https://newsapi.org/v2/everything";
     const response = await axios.get(apiUrl, {
       params: {
         q,
