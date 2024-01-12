@@ -20,6 +20,8 @@ app.use(bodyParser.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const apiKey = process.env.SERP_API_KEY;
+const region = 'vn';
+const language = 'vi';
 const loadHistoryFromFile = (jsonPath) => {
   try {
     const historyData = fs.readFileSync(jsonPath, "utf8");
@@ -161,8 +163,8 @@ app.post("/getProductList", async (req, res) => {
       params: {
         engine: "google_shopping",
         q: productName,
-        hl: "vi",
-        gl: "vn",
+        hl: language,
+        gl: region,
         tbs: "mr:1,avg_rating:300",
         api_key: apiKey,
       },
@@ -192,9 +194,9 @@ app.post("/getProductList", async (req, res) => {
 
 app.post("/getProductListPro", async (req, res) => {
   try {
-    const { productName } = req.body;
+    const { q } = req.body;
 
-    if (!productName) {
+    if (!q) {
       return res.status(400).json({ error: 'Missing "q" parameter' });
     }
 
@@ -206,8 +208,8 @@ app.post("/getProductListPro", async (req, res) => {
         "Content-Type": "application/json",
       },
       data: JSON.stringify({
-        q: productName,
-        gl: "vn",
+        q,
+        gl: region,
       }),
     };
     const response = await axios(config);
@@ -246,8 +248,8 @@ app.post("/getProductDetail", async (req, res) => {
       {
         engine: "google_product",
         product_id,
-        hl: "vi",
-        gl: "vn",
+        hl: language,
+        gl: region,
         api_key: apiKey,
       },
       (json) => {
@@ -260,26 +262,50 @@ app.post("/getProductDetail", async (req, res) => {
   }
 });
 
-app.post("/getStoreLocations", (req, res) => {
-  const { storeName, lat, long } = req.body;
+app.post("/getStoreLocations", async (req, res) => {
+  try {
+    const { storeName } = req.body;
 
-  if (!storeName || !lat || !long) {
-    return res.status(400).json({
-      error: "Please provide store name, latitude, and longitude parameters.",
-    });
+    if (!toreName) {
+      return res.status(400).json({ error: 'Missing "q" parameter' });
+    }
+
+    const config = {
+      method: "post",
+      url: "https://google.serper.dev/places",
+      headers: {
+        "X-API-KEY": process.env.SERPER_API_KEY,
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({
+        q: storeName,
+        gl: region,
+      }),
+    };
+    const response = await axios(config);
+
+    if (response.data.places && Array.isArray(response.data.places)) {
+      const transformProduct = (product) => {
+        const transformedProduct = {
+          product_id: product.id,
+          link: product.link,
+          source: product.source,
+          price: price,
+          thumbnail: product.imageUrl,
+          isNew: isNew,
+        };
+
+        return transformedProduct;
+      };
+      const transformedArray = response.data.places.map(transformProduct);
+      res.json(transformedArray);
+    } else {
+      res.json(response.data);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-  const ll = `@${lat},${long}`;
-  const queryParams = {
-    engine: "google_maps",
-    q: storeName,
-    ll,
-    type: "search",
-    api_key: apiKey,
-  };
-
-  getJson(queryParams, (json) => {
-    res.json(json);
-  });
 });
 
 app.post("/getLocalStoreLocations", (req, res) => {
@@ -289,8 +315,8 @@ app.post("/getLocalStoreLocations", (req, res) => {
     q: storeName,
     google_domain: "google.com.vn",
     location: "Ho Chi Minh City, Ho Chi Minh City, Vietnam",
-    hl: "vi",
-    gl: "vn",
+    hl: language,
+    gl: region,
     api_key: apiKey,
   };
 
