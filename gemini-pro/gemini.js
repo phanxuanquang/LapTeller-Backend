@@ -217,7 +217,7 @@ app.post("/getProductListPro", async (req, res) => {
     if (response.data.shopping && Array.isArray(response.data.shopping)) {
       const transformProduct = (product) => {
         const isNew = !product.price.includes("used");
-        const price = product.price.replace(/[₫,used]/g, "").trim();
+        const price = product.price.replace(/[₫,used]/g, "").replaceAll("+ tax", "").trim();
 
         const transformedProduct = {
           product_id: product.id,
