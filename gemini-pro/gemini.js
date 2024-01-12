@@ -194,9 +194,9 @@ app.post("/getProductList", async (req, res) => {
 
 app.post("/getProductListPro", async (req, res) => {
   try {
-    const { q } = req.body;
+    const { productName } = req.body;
 
-    if (!q) {
+    if (!productName) {
       return res.status(400).json({ error: 'Missing "q" parameter' });
     }
 
@@ -208,7 +208,7 @@ app.post("/getProductListPro", async (req, res) => {
         "Content-Type": "application/json",
       },
       data: JSON.stringify({
-        q,
+        q: productName,
         gl: region,
       }),
     };
