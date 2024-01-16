@@ -20,8 +20,8 @@ app.use(bodyParser.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const apiKey = process.env.SERP_API_KEY;
-const region = 'vn';
-const language = 'vi';
+const region = "vn";
+const language = "vi";
 const loadHistoryFromFile = (jsonPath) => {
   try {
     const historyData = fs.readFileSync(jsonPath, "utf8");
@@ -32,9 +32,20 @@ const loadHistoryFromFile = (jsonPath) => {
     return [];
   }
 };
+function UpdateConversation(role, text, JsonArray) {
+  const newElement = {
+    "role": role,
+    "parts": [
+      {
+        "text": text
+      }
+    ]
+  };
+  JsonArray.push(newElement);
+  return JsonArray;
+}
 
-const chatLog = loadHistoryFromFile("gemini-pro/train-context-laptop.json");
-//const chatLog = loadHistoryFromFile("gemini-pro/train-context-smartphone.json");
+let chatLog = loadHistoryFromFile("gemini-pro/train-context-laptop.json");
 
 const askGemini = async (question, res) => {
   let tryCount = 0;
@@ -105,6 +116,8 @@ const askGemini = async (question, res) => {
       const jsonData = JSON.parse(text);
       res.json(jsonData);
       console.log(response.text().trim());
+      chatLog = UpdateConversation("user", question, chatLog);
+      chatLog = UpdateConversation("model", response.text().trim(), chatLog);
     } catch (error) {
       await handleRetry(text);
     }
@@ -217,7 +230,10 @@ app.post("/getProductListPro", async (req, res) => {
     if (response.data.shopping && Array.isArray(response.data.shopping)) {
       const transformProduct = (product) => {
         const isNew = !product.price.includes("used");
-        const price = product.price.replace(/[₫,used]/g, "").replaceAll("+ tax", "").trim();
+        const price = product.price
+          .replace(/[₫,used]/g, "")
+          .replaceAll("+ tax", "")
+          .trim();
 
         const transformedProduct = {
           product_id: product.id,
@@ -262,59 +278,13 @@ app.post("/getProductDetail", async (req, res) => {
   }
 });
 
-app.post("/getStoreLocations", async (req, res) => {
-  try {
-    const { storeName } = req.body;
-
-    if (!toreName) {
-      return res.status(400).json({ error: 'Missing "q" parameter' });
-    }
-
-    const config = {
-      method: "post",
-      url: "https://google.serper.dev/places",
-      headers: {
-        "X-API-KEY": process.env.SERPER_API_KEY,
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify({
-        q: storeName,
-        gl: region,
-      }),
-    };
-    const response = await axios(config);
-
-    if (response.data.places && Array.isArray(response.data.places)) {
-      const transformProduct = (product) => {
-        const transformedProduct = {
-          product_id: product.id,
-          link: product.link,
-          source: product.source,
-          price: price,
-          thumbnail: product.imageUrl,
-          isNew: isNew,
-        };
-
-        return transformedProduct;
-      };
-      const transformedArray = response.data.places.map(transformProduct);
-      res.json(transformedArray);
-    } else {
-      res.json(response.data);
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 app.post("/getLocalStoreLocations", (req, res) => {
   const { storeName } = req.body;
   const queryParams = {
     engine: "google_local",
     q: storeName,
     google_domain: "google.com.vn",
-    location: "Ho Chi Minh City, Ho Chi Minh City, Vietnam",
+    location: "Vietnam",
     hl: language,
     gl: region,
     api_key: apiKey,
