@@ -309,8 +309,10 @@ app.get("/news", async (req, res) => {
         apiKey: process.env.NEWS_API_KEY,
       },
     });
+    
+    const filteredArticles = response.data.articles.filter(article => article.urlToImage !== null);
 
-    res.json(response.data.articles);
+    res.json(filteredArticles);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
