@@ -19,7 +19,15 @@ Step 1. Install Node.js and npm (skip if you had it already):
 - [**Node.js**](https://nodejs.org/en/download/package-manager)
 - [**npm**](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
+Step 2: Clone repository for backend.
+```console
+git clone https://github.com/phanxuanquang/LapTeller-Backend
+```
+
 Step 2: Clone sub-module for frontend.
+```console
+cd LapTeller-Backend
+```
 ```console
 git submodule update --init --recursive
 ```
