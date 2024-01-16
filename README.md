@@ -64,7 +64,7 @@ npm i
 ### 2.2. Usage:
 ##### 2.2.1. Start Node.js server:
 ```console
-node gemini-pro/gemini.js
+node LapTeller.js
 ```
 ##### 2.2.1. Start React application:
 ```console
