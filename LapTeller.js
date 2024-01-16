@@ -45,7 +45,7 @@ function UpdateConversation(role, text, JsonArray) {
   return JsonArray;
 }
 
-let chatLog = loadHistoryFromFile("gemini-pro/train-context-laptop.json");
+let chatLog = loadHistoryFromFile("chatLog.json");
 
 const askGemini = async (question, res) => {
   let tryCount = 0;
