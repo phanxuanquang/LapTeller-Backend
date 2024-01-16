@@ -34,12 +34,12 @@ const loadHistoryFromFile = (jsonPath) => {
 };
 function UpdateConversation(role, text, JsonArray) {
   const newElement = {
-    "role": role,
-    "parts": [
+    role: role,
+    parts: [
       {
-        "text": text
-      }
-    ]
+        text: text,
+      },
+    ],
   };
   JsonArray.push(newElement);
   return JsonArray;
