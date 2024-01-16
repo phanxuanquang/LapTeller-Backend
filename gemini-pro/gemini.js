@@ -64,8 +64,9 @@ const askGemini = async (question, res) => {
       console.error("Exceeded maximum retries.");
       res.status(500).json({ error: "Exceeded maximum retries." });
     } else {
+      question = `I want a better answer, and remember to provide response in JSON format as my example. My question: ${question}`;
       await askGemini(
-        `I want a better answer, and remember to provide response in JSON format as my example. My question: ${question}`,
+        question,
         res
       );
     }
