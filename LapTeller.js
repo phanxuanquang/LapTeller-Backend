@@ -310,7 +310,7 @@ app.get("/news", async (req, res) => {
       },
     });
 
-    res.json(response.data);
+    res.json(response.data.articles);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
