@@ -13,7 +13,6 @@ const {
 require("dotenv").config();
 
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
@@ -43,6 +42,17 @@ function UpdateConversation(role, text, JsonArray) {
   };
   JsonArray.push(newElement);
   return JsonArray;
+}
+async function getImageAsBase64(url) {
+  try {
+    const response = await axios.get(url, { responseType: "arraybuffer" });
+    const base64Data = Buffer.from(response.data, "binary").toString("base64");
+
+    return base64Data;
+  } catch (error) {
+    console.error("Error fetching or converting the image:", error.message);
+    throw error;
+  }
 }
 
 let chatLog = loadHistoryFromFile("chatLog.json");
@@ -75,7 +85,7 @@ const askGemini = async (question, res) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const generationConfig = {
-      temperature: 0.9,
+      temperature: 0.4,
       topK: 1,
       topP: 1,
       maxOutputTokens: 2048,
@@ -135,9 +145,7 @@ app.post("/ask", async (req, res) => {
 app.post("/askImg", async (req, res) => {
   const { question, imageUrl } = req.body;
   try {
-    const imageResponse = await fetch(imageUrl);
-    const imageBuffer = await imageResponse.buffer();
-    const base64Image = imageBuffer.toString("base64");
+    const base64Image = base64 ?? (await getImageAsBase64(imageUrl));
     const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
 
     const parts = [
@@ -149,7 +157,7 @@ app.post("/askImg", async (req, res) => {
       },
       {
         text:
-          "You are only allowed to answer questions related to laptop, and use English to answer. Your answer must be clear and very easy for non-tech people to understand. You can give me some useful advice if necessary if needed or provide some information related to the laptop in the image if any. My question: " +
+          "You are only allowed to answer questions related to laptop, and use English or Vietnamese to answer (depend on user input language). Your answer must be clear and very easy for non-tech people to understand. You can give me some useful advice if necessary if needed or provide some information related to the laptop in the image if any. My query: " +
           question,
       },
     ];
@@ -162,7 +170,8 @@ app.post("/askImg", async (req, res) => {
     });
 
     const responseText = result.response.text().trim();
-    console.log(responseText);
+    chatLog = UpdateConversation("user", question, chatLog);
+    chatLog = UpdateConversation("model", responseText, chatLog);
     res.json({ answer: responseText });
   } catch (error) {
     console.error("Error:", error);
