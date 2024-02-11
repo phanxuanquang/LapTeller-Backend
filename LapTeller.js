@@ -75,10 +75,7 @@ const askGemini = async (question, res) => {
       res.status(500).json({ error: "Exceeded maximum retries." });
     } else {
       question = `I want a better answer, and remember to provide response in JSON format as my example. My question: ${question}`;
-      await askGemini(
-        question,
-        res
-      );
+      await askGemini(question, res);
     }
   };
 
@@ -318,8 +315,10 @@ app.get("/news", async (req, res) => {
         apiKey: process.env.NEWS_API_KEY,
       },
     });
-    
-    const filteredArticles = response.data.articles.filter(article => article.urlToImage !== null);
+
+    const filteredArticles = response.data.articles.filter(
+      (article) => article.urlToImage !== null
+    );
 
     res.json(filteredArticles);
   } catch (error) {
