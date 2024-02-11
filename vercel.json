@@ -1,0 +1,15 @@
+{
+    "version" : 2,
+    "build": [
+        {
+            "src": "./LapTeller.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "route": [
+        {
+            "src": "/(.*)",
+            "dest": "/"
+        }
+    ]
+}
