@@ -11,9 +11,9 @@ const {
   HarmBlockThreshold,
 } = require("@google/generative-ai");
 require("dotenv").config();
+const PORT = process.env.PORT || 5000;
 
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
@@ -45,7 +45,19 @@ function UpdateConversation(role, text, JsonArray) {
   return JsonArray;
 }
 
-let chatLog = loadHistoryFromFile("chatLog.json");
+async function getImageAsBase64(url) {
+  try {
+    const response = await axios.get(url, { responseType: "arraybuffer" });
+    const base64Data = Buffer.from(response.data, "binary").toString("base64");
+
+    return base64Data;
+  } catch (error) {
+    console.error("Error fetching or converting the image:", error.message);
+    throw error;
+  }
+}
+
+const chatLog = loadHistoryFromFile("chatLog.json");
 
 const askGemini = async (question, res) => {
   let tryCount = 0;
@@ -65,17 +77,14 @@ const askGemini = async (question, res) => {
       res.status(500).json({ error: "Exceeded maximum retries." });
     } else {
       question = `I want a better answer, and remember to provide response in JSON format as my example. My question: ${question}`;
-      await askGemini(
-        question,
-        res
-      );
+      await askGemini(question, res);
     }
   };
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const generationConfig = {
-      temperature: 0.9,
+      temperature: 0.4,
       topK: 1,
       topP: 1,
       maxOutputTokens: 2048,
@@ -135,9 +144,7 @@ app.post("/ask", async (req, res) => {
 app.post("/askImg", async (req, res) => {
   const { question, imageUrl } = req.body;
   try {
-    const imageResponse = await fetch(imageUrl);
-    const imageBuffer = await imageResponse.buffer();
-    const base64Image = imageBuffer.toString("base64");
+    const base64Image = base64 ?? (await getImageAsBase64(imageUrl));
     const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
 
     const parts = [
@@ -157,12 +164,13 @@ app.post("/askImg", async (req, res) => {
     const result = await model.generateContent({
       contents: [{ role: "user", parts }],
       generationConfig: {
-        maxOutputTokens: 4096,
+        maxOutputTokens: 2048,
       },
     });
 
     const responseText = result.response.text().trim();
-    console.log(responseText);
+    chatLog = UpdateConversation("user", question, chatLog);
+    chatLog = UpdateConversation("model", responseText, chatLog);
     res.json({ answer: responseText });
   } catch (error) {
     console.error("Error:", error);
@@ -309,8 +317,10 @@ app.get("/news", async (req, res) => {
         apiKey: process.env.NEWS_API_KEY,
       },
     });
-    
-    const filteredArticles = response.data.articles.filter(article => article.urlToImage !== null);
+
+    const filteredArticles = response.data.articles.filter(
+      (article) => article.urlToImage !== null
+    );
 
     res.json(filteredArticles);
   } catch (error) {
@@ -318,7 +328,6 @@ app.get("/news", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
