@@ -83,12 +83,12 @@ const askGemini = async (question, res) => {
   };
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const generationConfig = {
       temperature: 0.4,
       topK: 1,
       topP: 1,
-      maxOutputTokens: 2048,
+      responseMimeType: "application/json" 
     };
 
     const safetySettings = [
@@ -146,7 +146,7 @@ app.post("/askImg", async (req, res) => {
   const { question, imageUrl } = req.body;
   try {
     const base64Image = base64 ?? (await getImageAsBase64(imageUrl));
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const parts = [
       {
@@ -165,7 +165,7 @@ app.post("/askImg", async (req, res) => {
     const result = await model.generateContent({
       contents: [{ role: "user", parts }],
       generationConfig: {
-        maxOutputTokens: 4096,
+        maxOutputTokens: 8000,
       },
     });
 
