@@ -83,7 +83,7 @@ const askGemini = async (question, res) => {
   };
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const generationConfig = {
       temperature: 0.4,
       topK: 1,
